@@ -19,10 +19,6 @@ SENTRA is a security-focused API protection engine built with Spring Boot and Re
 
 ---
 
-## 🔗 Live Demo
-
-> **[▶ View Live Project](https://storebox-explorer7.onrender.com/)**  
-> Deployed on Render.
 
 
 ## 🛠️ Tech Stack
