@@ -3,6 +3,7 @@ package com.securegateway.controller;
 import com.securegateway.annotation.RateLimited;
 import com.securegateway.model.RateLimitLog;
 import com.securegateway.repository.RateLimitLogRepository;
+import com.securegateway.service.LoggingModeService;
 import com.securegateway.service.RateLimitConfigService;
 import com.securegateway.service.TokenBucketService;
 
@@ -19,11 +20,13 @@ public class GatekeeperController {
     private final RateLimitConfigService configService;
     private final RateLimitLogRepository logRepository;
     private final TokenBucketService tokenBucketService;
+    private final LoggingModeService loggingModeService;
     
-    public GatekeeperController(RateLimitConfigService configService, RateLimitLogRepository logRepository,TokenBucketService tokenBucketService) {
+    public GatekeeperController(RateLimitConfigService configService, RateLimitLogRepository logRepository,TokenBucketService tokenBucketService,LoggingModeService loggingModeService) {
         this.configService = configService;
         this.logRepository = logRepository;
         this.tokenBucketService = tokenBucketService;
+        this.loggingModeService=loggingModeService;
     }
 
     @GetMapping("/secure-data")
@@ -43,7 +46,7 @@ public class GatekeeperController {
 
     @GetMapping("/logs")
     public List<RateLimitLog> getLogs() {
-        return logRepository.findTop50ByOrderByTimestampDesc();
+        return logRepository.findAllByOrderByTimestampDesc();
     }
 
     @GetMapping("/config")
@@ -97,5 +100,25 @@ public class GatekeeperController {
     public Map<String, String> updateConfig(@RequestParam Integer capacity, @RequestParam Integer refillRate) {
         configService.setOverrides(capacity, refillRate);
         return Map.of("status", "Success", "message", "Rate limit config updated to Capacity: " + capacity + ", Refill Rate: " + refillRate);
+    }
+    
+    @GetMapping("/logging-mode")
+    public Map<String, Boolean> getLoggingMode() {
+        return Map.of("loadTestMode", loggingModeService.isLoadTestMode());
+    }
+
+    @PostMapping("/logging-mode")
+    public Map<String, Object> updateLoggingMode(@RequestParam boolean loadTestMode) {
+        loggingModeService.setLoadTestMode(loadTestMode);
+
+        return Map.of(
+                "status", "Success",
+                "loadTestMode", loadTestMode
+        );
+    }
+    @DeleteMapping("/logs")
+    public Map<String, String> clearLogs() {
+        logRepository.deleteAll();
+        return Map.of("status", "Logs cleared");
     }
 }

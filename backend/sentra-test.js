@@ -1,8 +1,8 @@
 import http from "k6/http";
 
 export const options = {
-  vus: 20,
-  duration: "5s",
+  vus: 450,
+  duration: "40s",
 };
 
 export default function () {
