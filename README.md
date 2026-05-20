@@ -72,7 +72,7 @@ backend/
 ├── repository/
 └── service/
 
----
+```
 
 ## ▶️ Running the Project
 
